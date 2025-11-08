@@ -6,8 +6,15 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+   
   <ItemGroup>
     <ProjectReference Include="..\CleanTemplate.Logic.UseCases\CleanTemplate.Logic.UseCases.csproj" />
+    <ProjectReference Include="..\CleanTemplate.Model.Domain\CleanTemplate.Model.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" />
   </ItemGroup>
 
 </Project>

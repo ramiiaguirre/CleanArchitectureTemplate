@@ -1,0 +1,17 @@
+using CleanTemplate.Logic.Repository;
+using CleanTemplate.Model.Domain;
+
+public class GetUsers
+{
+    private readonly IRepository<User> _repository = default!;
+    public GetUsers(IRepository<User> repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<IEnumerable<User>> Execute()
+    {
+        var users = await _repository.Get();
+        return users;
+    }
+}
