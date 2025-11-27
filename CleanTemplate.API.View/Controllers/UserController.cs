@@ -28,7 +28,7 @@ public class UserController : ControllerBase
     [HttpGet("{id}", Name = "GetUserById")]
     public async Task<ActionResult<UserDTO>> Get(long id)
     {
-        var user = await new GetUserById(_repository).Execute(id);
+        var user = await new GetUserById(_repository).Execute(id, true);
 
         if (user is null)
         {
@@ -41,13 +41,14 @@ public class UserController : ControllerBase
         var roles = new List<string>();
         foreach (var rol in user.Roles ?? Enumerable.Empty<Rol>())
         {
+            Console.WriteLine(rol.Name);
             roles.Add(rol.Name);
         }    
         
         return Ok(new UserDTO
         {
             Name = user.Name,
-            Roles = roles
+            Roles = roles.ToList()
         });
     }
     

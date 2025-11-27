@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using CleanTemplate.Logic.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -34,6 +35,19 @@ public class RepositoryEF<T> : IRepository<T> where T : class
         T? data = await _dbSet.FindAsync(id);
         return data;
     }
+
+    public async Task<T?> Get(long id, params Expression<Func<T, object>>[] includes)
+    {
+        IQueryable<T> query = _dbSet;
+        
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+        
+        return await query.FirstOrDefaultAsync(e => EF.Property<long>(e, "Id") == id);
+    }
+
 
     public async Task<IEnumerable<T>> Get()
     {

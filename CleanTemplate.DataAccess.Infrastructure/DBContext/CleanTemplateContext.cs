@@ -34,7 +34,7 @@ public class CleanTemplateContext : DbContext
             entity.HasKey(r => r.Id);
             entity.Property(r => r.Name).IsRequired().HasMaxLength(60);
             entity.Property(r => r.Description).IsRequired(false).HasMaxLength(120);
-            entity.Property(r => r.CreateAt).IsRequired();
+            entity.Property(r => r.CreatedAt).IsRequired();
             entity.Property(r => r.UpdateAt).IsRequired();
             // entity.HasMany(r => r.Permissions);
         });

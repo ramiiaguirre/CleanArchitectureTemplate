@@ -9,8 +9,11 @@ public class GetUserById
         _repository = repository;
     }
 
-    public async Task<User?> Execute(long id)
+    public async Task<User?> Execute(long id, bool modelComplete = false)
     {
+        if (modelComplete)
+            return await _repository.Get(id, u => u.Roles!);
+
         return await _repository.Get(id);
     }
 }
