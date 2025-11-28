@@ -1,4 +1,5 @@
 using CleanTemplate.Model.Domain;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,12 +11,14 @@ namespace CleanTemplate.API.View.Helpers;
 public class UtilsJWT
 {
     private readonly IConfiguration _configuration;
-    public UtilsJWT(IConfiguration configuration)
+    private readonly IMemoryCache _cache;
+    public UtilsJWT(IConfiguration configuration, IMemoryCache cache)
     {
         _configuration = configuration;
+        _cache = cache;
     }
 
-    public string EncriptarSHA256(string texto)
+    public string EncryptSHA256(string texto)
     {
         using (SHA256 sha256 = SHA256.Create())
         {
@@ -28,13 +31,13 @@ public class UtilsJWT
         }
     }
 
-    public string GenerarJWT(User user)
+    public string GenerateJWT(User user)
     {
         //Creación de informacion del Usuario para el token
         var userClaims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            // new Claim(ClaimTypes.Email, user.Email)
+            new Claim(ClaimTypes.Role, user.Roles.First().Name)
         };
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:key"]!));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
@@ -42,7 +45,7 @@ public class UtilsJWT
         //Crear detalle del token
         var jwtConfig = new JwtSecurityToken(
             claims: userClaims,
-            expires: DateTime.UtcNow.AddMinutes(10),
+            expires: DateTime.UtcNow.AddMinutes(30),
             signingCredentials: credentials
         );
 
@@ -51,6 +54,10 @@ public class UtilsJWT
 
     public bool ValidarToken(string token)
     {
+
+        if (IsInBlacklist(token))
+            return false;
+
         var claimsPrincipal = new ClaimsPrincipal();
         var tokenHandler = new JwtSecurityTokenHandler();
         var validationParameters = new TokenValidationParameters
@@ -73,5 +80,26 @@ public class UtilsJWT
         {
             return false;
         }
+    }
+
+    public void InvalidateToken(string token)
+    {
+        // Obtener la fecha de expiración del token
+        var expiracion = GetTokenExpiration(token);
+        
+        // Guardar en cache hasta que expire naturalmente
+        _cache.Set($"blacklist_{token}", true, expiracion);
+    }
+    
+    public bool IsInBlacklist(string token)
+    {
+        return _cache.TryGetValue($"blacklist_{token}", out _);
+    }
+    
+    private DateTimeOffset GetTokenExpiration(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        return DateTimeOffset.FromUnixTimeSeconds(jwtToken.Payload.Exp ?? 0);
     }
 }

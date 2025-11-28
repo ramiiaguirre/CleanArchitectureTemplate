@@ -22,15 +22,16 @@ public class AuthController : ControllerBase
     [HttpPost]
     [AllowAnonymous]
     [Route("signup")]
-    public async Task<IActionResult> SignUp(UserDTO user)
+    public async Task<IActionResult> SignUp(LoginDTO request)
     {
-        var modelo = new User
-        {
-            Name = user.Name,
-            Password = _utilsJWT.EncriptarSHA256(user.Password)
-        };
 
-       var userCreated = await new SignUp(_repository).Execute(modelo);
+        var userCreated = await new SignUp(_repository).Execute(
+            new User
+            {
+                Name = request.Name,
+                Password = _utilsJWT.EncryptSHA256(request.Password)
+            }
+        );
         
         if (userCreated.Id != 0)
             return StatusCode(StatusCodes.Status201Created, new { isSuccess = true });
@@ -41,14 +42,25 @@ public class AuthController : ControllerBase
     [HttpPost]
     [AllowAnonymous]
     [Route("login")]
-    public async Task<IActionResult> Login(LoginDTO login)
+    public async Task<IActionResult> Login(LoginDTO request)
     {
-        var usuarioEncontrado = await _repository.Get(u => u.Name == login.Name && u.Password == _utilsJWT.EncriptarSHA256(login.Password!));
+        var loggedInUser = await new LogIn(_repository)
+            .Execute(request.Name, _utilsJWT.EncryptSHA256(request.Password!));
 
-        if(usuarioEncontrado == null) 
-            return StatusCode(StatusCodes.Status404NotFound, new { isSuccess = false, token = "" });
+        if(loggedInUser == null)
+        {            
+            return StatusCode(
+                StatusCodes.Status404NotFound, 
+                new { isSuccess = false, token = "" }
+            );
+        }
         else
-            return StatusCode(StatusCodes.Status200OK, new { isSuccess = true, token = _utilsJWT.GenerarJWT(usuarioEncontrado)});
+        {
+            return StatusCode(
+                StatusCodes.Status200OK, 
+                new { isSuccess = true, token = _utilsJWT.GenerateJWT(loggedInUser)}
+            );
+        }
     }
 
     [HttpGet]
@@ -62,6 +74,22 @@ public class AuthController : ControllerBase
     {
         bool tokenValido = _utilsJWT.ValidarToken(token);
         return StatusCode(StatusCodes.Status200OK, new { isSuccess = tokenValido });
+    }
+
+    [HttpPost]
+    [Route("logout")]
+    public async Task<ActionResult> Logout()
+    {
+        // Obtener el token del header Authorization
+        var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        
+        if (string.IsNullOrEmpty(token))
+            return StatusCode(StatusCodes.Status400BadRequest, new { isSuccess = false, message = "Token no proporcionado" });
+        
+        // Agregar el token a la blacklist
+        _utilsJWT.InvalidateToken(token);
+        
+        return StatusCode(StatusCodes.Status200OK, new { isSuccess = true, message = "Sesión cerrada correctamente" });
     }
 
 }

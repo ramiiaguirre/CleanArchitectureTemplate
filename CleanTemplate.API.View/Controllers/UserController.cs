@@ -9,17 +9,14 @@ namespace CleanTemplate.API.View.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
     private IRepository<User> _repository;
 
-    public UserController(ILogger<UserController> logger,
-        IRepository<User> repository)
+    public UserController(IRepository<User> repository)
     {
-        _logger = logger;
         _repository = repository;
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpGet(Name = "GetUsers")]
     public async Task<IEnumerable<UserDTO>> Get()
     {

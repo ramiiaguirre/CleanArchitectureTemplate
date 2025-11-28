@@ -33,7 +33,11 @@ builder.Services.AddDbContext<CleanTemplateContext>(options =>
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(RepositoryEF<>));
 
+builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<UtilsJWT>();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -41,7 +45,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    // app.UseSwagger();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
