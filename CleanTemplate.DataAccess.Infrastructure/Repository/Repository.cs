@@ -48,6 +48,23 @@ public class RepositoryEF<T> : IRepository<T> where T : class
         return await query.FirstOrDefaultAsync(e => EF.Property<long>(e, "Id") == id);
     }
 
+    public async Task<T?> Get(Expression<Func<T, bool>> predicate)
+    {
+        return await _dbSet.FirstOrDefaultAsync(predicate);
+    }
+
+    // public async Task<T?> Get(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
+    // {
+    //     IQueryable<T> query = _dbSet;
+        
+    //     foreach (var include in includes)
+    //     {
+    //         query = query.Include(include);
+    //     }
+        
+    //     return await query.FirstOrDefaultAsync(predicate);
+    // }
+
 
     public async Task<IEnumerable<T>> Get()
     {

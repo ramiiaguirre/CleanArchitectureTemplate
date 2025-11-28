@@ -1,5 +1,6 @@
 using CleanTemplate.Logic.Repository;
 using CleanTemplate.Model.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanTemplate.API.View.Controllers;
@@ -18,6 +19,7 @@ public class UserController : ControllerBase
         _repository = repository;
     }
 
+    [Authorize]
     [HttpGet(Name = "GetUsers")]
     public async Task<IEnumerable<UserDTO>> Get()
     {
