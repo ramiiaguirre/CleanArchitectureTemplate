@@ -1,7 +1,7 @@
 using CleanTemplate.Logic.Repository;
 using CleanTemplate.Model.Domain;
 
-public class SignUp
+public class SignUp : ISignUp
 {
     private readonly IRepository<User> _repository = default!;
     public SignUp(IRepository<User> repository)

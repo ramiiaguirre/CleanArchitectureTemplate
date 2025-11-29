@@ -33,16 +33,16 @@ public class UtilsJWT
 
     public string GenerateJWT(User user)
     {
-        //Creación de informacion del Usuario para el token
+        //Create user info for the token 
         var userClaims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Role, user.Roles.First().Name)
+            new Claim(ClaimTypes.Role, user.Roles!.First().Name ?? string.Empty)
         };
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:key"]!));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
 
-        //Crear detalle del token
+        //Create detail of token
         var jwtConfig = new JwtSecurityToken(
             claims: userClaims,
             expires: DateTime.UtcNow.AddMinutes(30),
@@ -76,7 +76,7 @@ public class UtilsJWT
             claimsPrincipal= tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
             return true;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return false;
         }
@@ -84,10 +84,10 @@ public class UtilsJWT
 
     public void InvalidateToken(string token)
     {
-        // Obtener la fecha de expiración del token
+        // Get token expiration date
         var expiracion = GetTokenExpiration(token);
         
-        // Guardar en cache hasta que expire naturalmente
+        // Save in cache until expire 
         _cache.Set($"blacklist_{token}", true, expiracion);
     }
     
@@ -100,6 +100,6 @@ public class UtilsJWT
     {
         var handler = new JwtSecurityTokenHandler();
         var jwtToken = handler.ReadJwtToken(token);
-        return DateTimeOffset.FromUnixTimeSeconds(jwtToken.Payload.Exp ?? 0);
+        return DateTimeOffset.FromUnixTimeSeconds(jwtToken.Payload.Expiration ?? 0);
     }
 }

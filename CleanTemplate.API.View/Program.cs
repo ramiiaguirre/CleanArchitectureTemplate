@@ -28,10 +28,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddDbContext<CleanTemplateContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// builder.Services.AddDbContext<CleanTemplateContext>(options =>
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(RepositoryEF<>));
+// builder.Services.AddScoped(typeof(IRepository<>), typeof(RepositoryEF<>));
+
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddAuthUseCases();
+builder.Services.AddUserUseCases();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<UtilsJWT>();

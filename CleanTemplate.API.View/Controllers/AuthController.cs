@@ -9,13 +9,15 @@ namespace CleanTemplate.API.View.Controllers;
 [ApiController]
 [Route("[controller]")]
 public class AuthController : ControllerBase
-{
-    private IRepository<User> _repository;
+{  
+    private readonly ISignUp _signUp;
+    private readonly ILogIn _logIn;
     private readonly UtilsJWT _utilsJWT;
 
-    public AuthController(IRepository<User> repository, UtilsJWT utilsJWT)
+    public AuthController(ISignUp signUp, ILogIn logIn, UtilsJWT utilsJWT)
     {
-        _repository = repository;
+        _signUp = signUp;
+        _logIn = logIn;
         _utilsJWT = utilsJWT;
     }
 
@@ -24,8 +26,7 @@ public class AuthController : ControllerBase
     [Route("signup")]
     public async Task<IActionResult> SignUp(LoginDTO request)
     {
-
-        var userCreated = await new SignUp(_repository).Execute(
+        var userCreated = await _signUp.Execute(
             new User
             {
                 Name = request.Name,
@@ -44,7 +45,7 @@ public class AuthController : ControllerBase
     [Route("login")]
     public async Task<IActionResult> Login(LoginDTO request)
     {
-        var loggedInUser = await new LogIn(_repository)
+        var loggedInUser = await _logIn
             .Execute(request.Name, _utilsJWT.EncryptSHA256(request.Password!));
 
         if(loggedInUser == null)
@@ -65,12 +66,7 @@ public class AuthController : ControllerBase
 
     [HttpGet]
     [Route("validarToken")]
-    /// <summary>
-    /// Recibe el token y controla su validez. 
-    /// </summary>
-    /// <param name="token"></param>
-    /// <returns></returns>
-    public IActionResult ValidarToken([FromQuery] string token)
+    public IActionResult ValidateToken([FromQuery] string token)
     {
         bool tokenValido = _utilsJWT.ValidarToken(token);
         return StatusCode(StatusCodes.Status200OK, new { isSuccess = tokenValido });
@@ -78,15 +74,15 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("logout")]
-    public async Task<ActionResult> Logout()
+    public ActionResult Logout()
     {
-        // Obtener el token del header Authorization
+        //Get token of the authorization header
         var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         
         if (string.IsNullOrEmpty(token))
             return StatusCode(StatusCodes.Status400BadRequest, new { isSuccess = false, message = "Token no proporcionado" });
         
-        // Agregar el token a la blacklist
+        // Add token in blacklist
         _utilsJWT.InvalidateToken(token);
         
         return StatusCode(StatusCodes.Status200OK, new { isSuccess = true, message = "Sesión cerrada correctamente" });

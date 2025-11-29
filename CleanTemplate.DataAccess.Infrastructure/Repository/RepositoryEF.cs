@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using CleanTemplate.Logic.Repository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 
 namespace CleanTemplate.DataAccess.Infrastructure;
 
@@ -18,7 +17,7 @@ public class RepositoryEF<T> : IRepository<T> where T : class
 
     public async Task<T> Add(T data)
     {
-        _dbSet.Add(data);
+        await _dbSet.AddAsync(data);
         return data;
     }
 
@@ -78,8 +77,11 @@ public class RepositoryEF<T> : IRepository<T> where T : class
 
     public async Task<T> Update(T data)
     {
-        _dbSet.Attach(data);
-        _dbContext.Entry(data).State = EntityState.Modified;
+        await Task.Run(() =>
+        {
+            _dbSet.Attach(data);
+            _dbContext.Entry(data).State = EntityState.Modified;            
+        });
         return data;
     }
 }
