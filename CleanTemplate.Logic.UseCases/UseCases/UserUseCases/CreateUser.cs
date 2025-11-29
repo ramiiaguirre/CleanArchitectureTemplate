@@ -1,10 +1,10 @@
 using CleanTemplate.Logic.Repository;
 using CleanTemplate.Model.Domain;
 
-public class AddUser
+public class CreateUser : ICreateUser
 {
     private readonly IRepository<User> _repository = default!;
-    public AddUser(IRepository<User> repository)
+    public CreateUser(IRepository<User> repository)
     {
         _repository = repository;
     }

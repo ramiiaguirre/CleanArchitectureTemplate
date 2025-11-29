@@ -1,5 +1,6 @@
 using CleanTemplate.Logic.Repository;
 using CleanTemplate.Model.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanTemplate.API.View.Controllers;
@@ -8,27 +9,29 @@ namespace CleanTemplate.API.View.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
-    private IRepository<User> _repository;
+    private readonly IGetUserById _getUserById;
+    private readonly IGetUsers _getUsers;
+    private readonly ICreateUser _createUser;
 
-    public UserController(ILogger<UserController> logger,
-        IRepository<User> repository)
+    public UserController(IGetUserById getUserById, IGetUsers getUsers, ICreateUser createUser)
     {
-        _logger = logger;
-        _repository = repository;
+        _getUserById = getUserById;
+        _getUsers = getUsers;
+        _createUser = createUser;
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet(Name = "GetUsers")]
     public async Task<IEnumerable<UserDTO>> Get()
     {
-        var users = await new GetUsers(_repository).Execute();
-        return users.Select(u => new UserDTO { Name = u.Name });
+        var users = await _getUsers.Execute();
+        return users.Select(u => new UserDTO { Name = u.Name }).ToArray();
     }
 
     [HttpGet("{id}", Name = "GetUserById")]
     public async Task<ActionResult<UserDTO>> Get(long id)
     {
-        var user = await new GetUserById(_repository).Execute(id, true);
+        var user = await _getUserById.Execute(id, true);
 
         if (user is null)
         {
@@ -52,10 +55,4 @@ public class UserController : ControllerBase
         });
     }
     
-    // [HttpPost(Name = "PostUser")]
-    // public async Task<IEnumerable<UserDTO>> Post()
-    // {
-    //     var users = await _repository.Get();
-    //     return users.Select(u => new UserDTO { Name = u.Name});
-    // }
 }

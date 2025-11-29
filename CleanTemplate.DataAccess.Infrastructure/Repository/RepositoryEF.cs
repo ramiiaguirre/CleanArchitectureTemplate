@@ -1,7 +1,6 @@
 using System.Linq.Expressions;
 using CleanTemplate.Logic.Repository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 
 namespace CleanTemplate.DataAccess.Infrastructure;
 
@@ -18,7 +17,7 @@ public class RepositoryEF<T> : IRepository<T> where T : class
 
     public async Task<T> Add(T data)
     {
-        _dbSet.Add(data);
+        await _dbSet.AddAsync(data);
         return data;
     }
 
@@ -48,6 +47,23 @@ public class RepositoryEF<T> : IRepository<T> where T : class
         return await query.FirstOrDefaultAsync(e => EF.Property<long>(e, "Id") == id);
     }
 
+    public async Task<T?> Get(Expression<Func<T, bool>> predicate)
+    {
+        return await _dbSet.FirstOrDefaultAsync(predicate);
+    }
+
+    public async Task<T?> Get(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
+    {
+        IQueryable<T> query = _dbSet;
+        
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+        
+        return await query.FirstOrDefaultAsync(predicate);
+    }
+
 
     public async Task<IEnumerable<T>> Get()
     {
@@ -61,8 +77,11 @@ public class RepositoryEF<T> : IRepository<T> where T : class
 
     public async Task<T> Update(T data)
     {
-        _dbSet.Attach(data);
-        _dbContext.Entry(data).State = EntityState.Modified;
+        await Task.Run(() =>
+        {
+            _dbSet.Attach(data);
+            _dbContext.Entry(data).State = EntityState.Modified;            
+        });
         return data;
     }
 }

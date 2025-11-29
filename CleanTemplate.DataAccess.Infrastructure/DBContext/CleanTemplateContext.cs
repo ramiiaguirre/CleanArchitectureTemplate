@@ -19,6 +19,7 @@ public class CleanTemplateContext : DbContext
             entity.ToTable("Users");
             entity.HasKey(u => u.Id);
             entity.Property(u => u.Name).IsRequired().HasMaxLength(60);
+            entity.Property(u => u.Password).IsRequired(false).HasMaxLength(100);
             entity.HasMany(u => u.Roles)
                 .WithMany(u => u.Users)
                 .UsingEntity<Dictionary<string, object>>(

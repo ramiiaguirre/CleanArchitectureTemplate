@@ -1,7 +1,7 @@
 using CleanTemplate.Logic.Repository;
 using CleanTemplate.Model.Domain;
 
-public class GetUserById
+public class GetUserById : IGetUserById
 {
     private readonly IRepository<User> _repository = default!;
     public GetUserById(IRepository<User> repository)
