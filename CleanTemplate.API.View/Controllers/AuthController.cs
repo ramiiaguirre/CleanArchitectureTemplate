@@ -1,5 +1,6 @@
 using CleanTemplate.API.View.Helpers;
-using CleanTemplate.Logic.Repository;
+using CleanTemplate.Logic.UseCases.Repository;
+using CleanTemplate.Logic.UseCases.DTOs;
 using CleanTemplate.Model.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,4 @@
-namespace CleanTemplate.API.View;
+namespace CleanTemplate.Logic.UseCases.DTOs;
 public class LoginDTO
 {
     public string Name { get; set; } = string.Empty;

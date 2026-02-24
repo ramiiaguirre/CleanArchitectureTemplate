@@ -1,4 +1,4 @@
-using CleanTemplate.Logic.Repository;
+using CleanTemplate.Logic.UseCases.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

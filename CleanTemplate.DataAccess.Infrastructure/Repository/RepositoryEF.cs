@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using CleanTemplate.Logic.Repository;
+using CleanTemplate.Logic.UseCases.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanTemplate.DataAccess.Infrastructure;

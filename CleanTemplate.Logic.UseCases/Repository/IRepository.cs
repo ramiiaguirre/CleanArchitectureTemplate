@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace CleanTemplate.Logic.Repository;
+namespace CleanTemplate.Logic.UseCases.Repository;
 
 public interface IRepository<T>
 {

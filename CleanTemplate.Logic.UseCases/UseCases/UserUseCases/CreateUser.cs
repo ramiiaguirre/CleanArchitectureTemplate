@@ -1,4 +1,4 @@
-using CleanTemplate.Logic.Repository;
+using CleanTemplate.Logic.UseCases.Repository;
 using CleanTemplate.Model.Domain;
 
 public class CreateUser : ICreateUser
