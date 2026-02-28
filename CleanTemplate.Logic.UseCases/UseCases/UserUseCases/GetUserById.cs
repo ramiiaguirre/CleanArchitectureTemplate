@@ -1,5 +1,5 @@
-using CleanTemplate.Logic.UseCases.Repository;
 using CleanTemplate.Model.Domain;
+using CleanTemplate.Model.Domain.Interfaces;
 
 public class GetUserById : IGetUserById
 {

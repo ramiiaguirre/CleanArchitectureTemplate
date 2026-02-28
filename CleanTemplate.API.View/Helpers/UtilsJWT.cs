@@ -1,4 +1,4 @@
-using CleanTemplate.Model.Domain;
+using CleanTemplate.Logic.UseCases.DTOs;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -31,13 +31,13 @@ public class UtilsJWT
         }
     }
 
-    public string GenerateJWT(User user)
+    public string GenerateJWT(UserDTO user)
     {
         //Create user info for the token 
         var userClaims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Role, user.Roles!.First().Name ?? string.Empty)
+            new Claim(ClaimTypes.NameIdentifier, user.Name),
+            new Claim(ClaimTypes.Role, user.Roles!.First() ?? string.Empty)
         };
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:key"]!));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);

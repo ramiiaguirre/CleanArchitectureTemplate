@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
-using CleanTemplate.Logic.UseCases.Repository;
 using Microsoft.EntityFrameworkCore;
+using CleanTemplate.Model.Domain.Interfaces;
 
 namespace CleanTemplate.DataAccess.Infrastructure;
 

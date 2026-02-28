@@ -1,6 +1,6 @@
-using CleanTemplate.Model.Domain;
-
+using CleanTemplate.Logic.UseCases.DTOs;
+namespace CleanTemplate.Logic.UseCases.Interfaces;
 public interface ISignUp
 {
-    Task<User> Execute(User user);
+    Task<UserDTO> Execute(SignUpDTO signUp);
 }

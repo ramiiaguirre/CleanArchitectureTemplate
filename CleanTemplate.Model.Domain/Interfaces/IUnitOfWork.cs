@@ -1,6 +1,6 @@
 using CleanTemplate.Model.Domain;
 
-namespace CleanTemplate.Logic.UseCases.Repository;
+namespace CleanTemplate.Model.Domain.Interfaces;
 public interface IUnitOfWork
 {
     public IRepository<User> Users { get; }

@@ -54,4 +54,6 @@ TestResult.xml
 nunit-*.xml
 
 bin/
-obj/	
+obj/
+.vs/
+	

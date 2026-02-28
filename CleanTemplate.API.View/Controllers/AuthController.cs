@@ -1,7 +1,6 @@
 using CleanTemplate.API.View.Helpers;
-using CleanTemplate.Logic.UseCases.Repository;
 using CleanTemplate.Logic.UseCases.DTOs;
-using CleanTemplate.Model.Domain;
+using CleanTemplate.Logic.UseCases.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,14 +27,14 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> SignUp(LoginDTO request)
     {
         var userCreated = await _signUp.Execute(
-            new User
+            new SignUpDTO
             {
                 Name = request.Name,
                 Password = _utilsJWT.EncryptSHA256(request.Password)
             }
         );
         
-        if (userCreated.Id != 0)
+        if (string.IsNullOrEmpty(userCreated.Name))
             return StatusCode(StatusCodes.Status201Created, new { isSuccess = true });
         else 
             return StatusCode(StatusCodes.Status200OK, new { isSuccess = false });
@@ -46,8 +45,11 @@ public class AuthController : ControllerBase
     [Route("login")]
     public async Task<IActionResult> Login(LoginDTO request)
     {
-        var loggedInUser = await _logIn
-            .Execute(request.Name, _utilsJWT.EncryptSHA256(request.Password!));
+        var loggedInUser = await _logIn.Execute(new LoginDTO
+        {
+            Name = request.Name,
+            Password = _utilsJWT.EncryptSHA256(request.Password!)
+        });
 
         if(loggedInUser == null)
         {            

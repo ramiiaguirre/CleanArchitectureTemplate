@@ -1,5 +1,9 @@
-using CleanTemplate.Logic.UseCases.Repository;
+using CleanTemplate.Logic.UseCases.Interfaces;
+using CleanTemplate.Logic.UseCases.DTOs;
 using CleanTemplate.Model.Domain;
+using CleanTemplate.Model.Domain.Interfaces;
+
+namespace CleanTemplate.Logic.UseCases;
 
 public class LogIn : ILogIn
 {
@@ -9,13 +13,13 @@ public class LogIn : ILogIn
         _repository = repository;
     }
 
-    public async Task<User?> Execute(string name, string passwordHash)
+    public async Task<UserDTO?> Execute(LoginDTO login)
     {
         var loggedInUser = await _repository.Get(
-            u => u.Name == name && u.Password == passwordHash, 
+            u => u.Name == login.Name && u.Password == login.Password, 
             u => u.Roles!
         );
-        return loggedInUser;
+        return new UserDTO(); //Do Mapping
     }
     
 }

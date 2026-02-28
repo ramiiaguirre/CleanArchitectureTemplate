@@ -1,3 +1,5 @@
+using CleanTemplate.Logic.UseCases;
+using CleanTemplate.Logic.UseCases.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 public static class AuthDependencyInjection
